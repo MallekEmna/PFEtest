@@ -1,0 +1,79 @@
+<!-- Modal Overlay -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <!-- Modal Content -->
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+          <lucide-angular [img]="UserIcon" class="w-5 h-5 text-white"></lucide-angular>
+        </div>
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">Add New Student</h2>
+          <p class="text-sm text-gray-600">Fill in the student information</p>
+        </div>
+      </div>
+      <button (click)="onClose()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+        <lucide-angular [img]="XIcon" class="w-5 h-5 text-gray-500"></lucide-angular>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <form (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+          <div class="flex items-center gap-2">
+            <lucide-angular [img]="UserIcon" class="w-4 h-4 text-gray-400"></lucide-angular>
+            Username
+          </div>
+        </label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="newStudent.username"
+          name="username"
+          required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          placeholder="Enter student username"
+        />
+      </div>
+
+      <!-- Level Field -->
+      <div>
+        <label for="level" class="block text-sm font-medium text-gray-700 mb-2">
+          <div class="flex items-center gap-2">
+            <lucide-angular [img]="GraduationCapIcon" class="w-4 h-4 text-gray-400"></lucide-angular>
+            Level
+          </div>
+        </label>
+        <select
+          id="level"
+          [(ngModel)]="newStudent.level"
+          name="level"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        >
+          <option [value]="Level.PRIMARY">Primary</option>
+          <option [value]="Level.MIDDLE">Middle</option>
+          <option [value]="Level.HIGH">High</option>
+        </select>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex gap-3 pt-4">
+        <button
+          type="button"
+          (click)="onClose()"
+          class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
+          Add Student
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

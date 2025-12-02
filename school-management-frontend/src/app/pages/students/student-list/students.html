@@ -1,0 +1,45 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Student List</h2>
+    <button (click)="showAddForm()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+      Add Student
+    </button>
+  </div>
+  
+  <!-- État de chargement -->
+  <div *ngIf="isLoading" class="text-center py-8">
+    <p class="text-gray-600 mt-2">Loading students...</p>
+  </div>
+  
+  <!-- État d'erreur -->
+  <div *ngIf="hasError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    <div class="flex items-center gap-2">
+      <p>Error loading students. Please try again.</p>
+    </div>
+    <button (click)="loadStudents()" class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2">
+      Retry
+    </button>
+  </div>
+  
+  <!-- Table des étudiants -->
+  <div *ngIf="!isLoading && !hasError">
+    <app-student-table [data]="students" (studentDeleted)="onStudentDeleted($event)"></app-student-table>
+  </div>
+  
+  <!-- Debug info -->
+  <div class="mt-4 p-4 bg-gray-100 rounded text-sm">
+    <div class="flex items-center gap-2 mb-2">
+      <p class="font-medium">Debug info:</p>
+    </div>
+    <p>Students count: {{ students.length }}</p>
+    <p>Is loading: {{ isLoading }}</p>
+    <p>Has error: {{ hasError }}</p>
+  </div>
+  
+  <!-- Student Form Modal -->
+  <app-student-form 
+    *ngIf="showForm" 
+    (studentAdded)="onStudentAdded($event)" 
+    (formClosed)="hideForm()">
+  </app-student-form>
+</div>
