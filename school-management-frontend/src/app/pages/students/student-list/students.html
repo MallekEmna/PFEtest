@@ -23,7 +23,7 @@
   
   <!-- Table des étudiants -->
   <div *ngIf="!isLoading && !hasError">
-    <app-student-table [data]="students" (studentDeleted)="onStudentDeleted($event)"></app-student-table>
+    <app-student-table [data]="students" (deleteStudentRequest)="onDeleteStudentRequest($event)" (editStudentRequest)="openEditForm($event)"></app-student-table>
   </div>
   
   <!-- Debug info -->
@@ -42,4 +42,13 @@
     (studentAdded)="onStudentAdded($event)" 
     (formClosed)="hideForm()">
   </app-student-form>
+
+  <!-- Student Edit Modal -->
+  <app-student-edit 
+    *ngIf="showEditForm" 
+    [student]="selectedStudent" 
+    [isVisible]="showEditForm"
+    (studentUpdated)="onStudentUpdated($event)" 
+    (formClosed)="hideEditForm()">
+  </app-student-edit>
 </div>

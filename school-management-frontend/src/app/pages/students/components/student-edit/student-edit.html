@@ -1,0 +1,78 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" *ngIf="isVisible">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform transition-all">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+      <div class="flex items-center gap-3">
+        <lucide-angular [img]="UserIcon" class="w-5 h-5 text-blue-600"></lucide-angular>
+        <h3 class="text-lg font-semibold text-gray-800">Edit Student</h3>
+      </div>
+      <button (click)="closeForm()" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <lucide-angular [img]="XIcon" class="w-5 h-5"></lucide-angular>
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+      <!-- Username Field -->
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+          Username
+        </label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <lucide-angular [img]="UserIcon" class="w-4 h-4 text-gray-400"></lucide-angular>
+          </div>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="editForm.username"
+            required
+            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="Enter username"
+          >
+        </div>
+      </div>
+
+      <!-- Level Field -->
+      <div>
+        <label for="level" class="block text-sm font-medium text-gray-700 mb-2">
+          Level
+        </label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <lucide-angular [img]="GraduationCapIcon" class="w-4 h-4 text-gray-400"></lucide-angular>
+          </div>
+          <select
+            id="level"
+            name="level"
+            [(ngModel)]="editForm.level"
+            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none"
+          >
+            <option *ngFor="let level of levels" [value]="level">
+              {{ getLevelName(level) }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 pt-4">
+        <button
+          type="button"
+          (click)="closeForm()"
+          class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+        >
+          <lucide-angular [img]="SaveIcon" class="w-4 h-4"></lucide-angular>
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

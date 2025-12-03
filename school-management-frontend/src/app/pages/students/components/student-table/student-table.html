@@ -56,11 +56,11 @@
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center gap-2">
-            <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+            <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1" (click)="requestEditStudent(student)">
               <lucide-angular [img]="EditIcon" class="w-4 h-4"></lucide-angular>
               Edit
             </button>
-            <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1" (click)="deleteStudent(student.id || i + 1)">
+            <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1" (click)="requestDeleteStudent(student.id || i + 1)">
               <lucide-angular [img]="Trash2Icon" class="w-4 h-4"></lucide-angular>
               Delete
             </button>

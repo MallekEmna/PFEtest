@@ -4,7 +4,6 @@ import { LucideAngularModule, User, GraduationCap, Edit, Trash2, Users } from 'l
 import { Student } from '../../../../models/student';
 import { Level } from '../../../../models/Level';
 import { LevelColorPipe } from '../../../../shared/pipe/LevelColorPipe';
-import { StudentService } from '../../../../services/StudentService';
 
 @Component({
   selector: 'app-student-table',
@@ -15,32 +14,26 @@ import { StudentService } from '../../../../services/StudentService';
 })
 export class StudentTable {
   @Input() data: Student[] = [];
-  @Output() studentDeleted = new EventEmitter<number>();
+  @Output() deleteStudentRequest = new EventEmitter<number>();
+  @Output() editStudentRequest = new EventEmitter<Student>();
   
   readonly UserIcon = User;
   readonly GraduationCapIcon = GraduationCap;
   readonly EditIcon = Edit;
   readonly Trash2Icon = Trash2;
   readonly UsersIcon = Users;
-  
-  constructor(private studentService: StudentService) {}
-  
+    
   getLevelName(level: Level): string {
-    return Level[level];
+    return level; // Now returns "PRIMARY", "MIDDLE", "HIGH" directly
   }
   
-  deleteStudent(studentId: number): void {
+  requestDeleteStudent(studentId: number): void {
     if (confirm('Are you sure you want to delete this student?')) {
-      this.studentService.deleteStudent(studentId).subscribe({
-        next: () => {
-          console.log('Student deleted successfully');
-          this.studentDeleted.emit(studentId);
-        },
-        error: (err) => {
-          console.error('Error deleting student:', err);
-          alert('Failed to delete student. Please try again.');
-        }
-      });
+      this.deleteStudentRequest.emit(studentId);
     }
+  }
+
+  requestEditStudent(student: Student): void {
+    this.editStudentRequest.emit(student);
   }
 }
