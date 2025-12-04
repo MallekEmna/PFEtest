@@ -10,7 +10,7 @@
       </button>
       <label class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 cursor-pointer">
         {{ isImporting ? 'Importing...' : 'Import' }}
-        <input type="file" (change)="onFileSelected($event)" accept=".xlsx,.xls" class="hidden" [disabled]="isImporting">
+        <input type="file" (change)="onFileSelected($event)" accept=".xls,.csv" class="hidden" [disabled]="isImporting">
       </label>
     </div>
   </div>

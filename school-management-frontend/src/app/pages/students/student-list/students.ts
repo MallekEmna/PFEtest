@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { StudentService } from '../../../services/StudentService';
 import { Student } from '../../../models/student';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { StudentTable } from '../components/student-table/student-table';
 import { StudentForm } from '../components/student-form/student-form';
 import { StudentEdit } from '../components/student-edit/student-edit';
 import { Level } from '../../../models/Level';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-students',
@@ -37,7 +38,7 @@ export class Students implements OnInit {
   isImporting = false;
   isExporting = false;
 
-  constructor(private studentService: StudentService) { }
+  constructor(private studentService: StudentService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     console.log('Students component initialized');
@@ -49,7 +50,13 @@ export class Students implements OnInit {
       next: () => {
         console.log('Student deleted successfully');
         this.students = this.students.filter(s => s.id !== studentId);
-        this.loadStudents();
+        if (this.searchQuery.trim()) {
+          this.searchStudents();
+        } else if (this.selectedLevel) {
+          this.filterByLevel();
+        } else {
+          this.loadStudents();
+        }
       },
       error: (err) => {
         console.error('Error deleting student:', err);
@@ -151,6 +158,7 @@ export class Students implements OnInit {
     }
     
     this.isLoading = true;
+    this.hasError = false;
     this.studentService.searchStudents(this.searchQuery).subscribe({
       next: (data: Student[]) => {
         this.students = data;
@@ -172,6 +180,7 @@ export class Students implements OnInit {
     }
     
     this.isLoading = true;
+    this.hasError = false;
     this.studentService.filterByLevel(this.selectedLevel as Level).subscribe({
       next: (data: Student[]) => {
         this.students = data;
@@ -188,6 +197,7 @@ export class Students implements OnInit {
   // Pagination functionality
   loadStudentsPage(): void {
     this.isLoading = true;
+    this.hasError = false;
     this.studentService.getStudentsPage(this.currentPage, this.pageSize).subscribe({
       next: (pageData: any) => {
         this.students = pageData.content;
@@ -210,53 +220,65 @@ export class Students implements OnInit {
 
   // Export functionality
   exportStudents(): void {
+    if (this.isExporting) return;
     this.isExporting = true;
-    this.studentService.exportStudents().subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'students.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        this.isExporting = false;
-      },
-      error: (err) => {
-        console.error('Error exporting students:', err);
-        alert('Failed to export students. Please try again.');
-        this.isExporting = false;
-      }
-    });
+    this.studentService.exportStudents()
+      .pipe(finalize(() => { this.isExporting = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (blob: Blob) => {
+          try {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'students.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+          } catch (e) {
+            console.error('Export handling error:', e);
+            alert('Failed to download file.');
+          }
+        },
+        error: (err) => {
+          console.error('Error exporting students:', err);
+          alert('Failed to export students. Please try again.');
+        }
+      });
   }
 
   // Import functionality
   onFileSelected(event: any): void {
-    const file = event.target.files[0];
+    if (this.isImporting) return;
+    const input = event.target as HTMLInputElement;
+    const file = input?.files && input.files[0];
     if (file) {
       this.importStudents(file);
+    }
+    // reset input so selecting the same file triggers change again
+    if (input) {
+      input.value = '';
     }
   }
 
   importStudents(file: File): void {
+    if (this.isImporting) return;
     this.isImporting = true;
-    this.studentService.importStudents(file).subscribe({
-      next: () => {
-        console.log('Students imported successfully');
-        this.loadStudents();
-        this.isImporting = false;
-        alert('Students imported successfully!');
-      },
-      error: (err) => {
-        console.error('Error importing students:', err);
-        alert('Failed to import students. Please try again.');
-        this.isImporting = false;
-      }
-    });
+    this.studentService.importStudents(file)
+      .pipe(finalize(() => { this.isImporting = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: () => {
+          console.log('Students imported successfully');
+          this.loadStudents();
+          alert('Students imported successfully!');
+        },
+        error: (err) => {
+          console.error('Error importing students:', err);
+          alert('Failed to import students. Please try again.');
+        }
+      });
   }
 
-  // Clear filters
   clearFilters(): void {
     this.searchQuery = '';
     this.selectedLevel = '';

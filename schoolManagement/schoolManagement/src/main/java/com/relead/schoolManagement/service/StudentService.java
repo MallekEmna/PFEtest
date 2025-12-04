@@ -77,7 +77,7 @@ public class StudentService {
             for (int i = 1; i < lines.length; i++) { // skip header
                 String[] fields = lines[i].split(",");
                 Student student = new Student();
-                student.setUsername(fields[0]);
+                student.setUsername(fields[1]);
                 student.setLevel(Level.valueOf(fields[2]));
                 repo.save(student);
             }

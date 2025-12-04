@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Level } from '../../models/Level';
 
 @Pipe({
-  name: 'levelColor'
+  name: 'levelColor',
+  standalone: true
 })
 export class LevelColorPipe implements PipeTransform {
 

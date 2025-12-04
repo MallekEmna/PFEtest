@@ -5,6 +5,8 @@ import com.relead.schoolManagement.entity.Student;
 import com.relead.schoolManagement.service.StudentService;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,57 +18,65 @@ import java.util.List;
 @CrossOrigin
 public class StudentController {
     @Autowired
-    private StudentService studentService ;
+    private StudentService studentService;
 
-        public StudentController(StudentService studentService) {
-            this.studentService = studentService;
-        }
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
+    }
 
-        @GetMapping
-        public List<Student> getAllStudents() {
-            return studentService.getAllStudents();
-        }
+    @GetMapping
+    public List<Student> getAllStudents() {
+        return studentService.getAllStudents();
+    }
 
-        @GetMapping("/{id}")
-        public Student getStudent(@PathVariable Long id) {
-            return studentService.getStudentById(id);
-        }
+    @GetMapping("/{id}")
+    public Student getStudent(@PathVariable Long id) {
+        return studentService.getStudentById(id);
+    }
 
-        @PostMapping
-        public Student createStudent(@RequestBody Student student) {
-            return studentService.createStudent(student);
-        }
+    @PostMapping
+    public Student createStudent(@RequestBody Student student) {
+        return studentService.createStudent(student);
+    }
 
-        @PutMapping("/{id}")
-        public Student updateStudent(@PathVariable Long id, @RequestBody Student student) {
-            return studentService.updateStudent(id, student);
-        }
+    @PutMapping("/{id}")
+    public Student updateStudent(@PathVariable Long id, @RequestBody Student student) {
+        return studentService.updateStudent(id, student);
+    }
 
-        @DeleteMapping("/{id}")
-        public void deleteStudent(@PathVariable Long id) {
-            studentService.deleteStudent(id);
-        }
+    @DeleteMapping("/{id}")
+    public void deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
+    }
 
-        @GetMapping("/search")
-        public List<Student> searchStudents(@RequestParam String q) {
-            return studentService.searchStudents(q);
-        }
+    @GetMapping("/search")
+    public List<Student> searchStudents(@RequestParam String q) {
+        return studentService.searchStudents(q);
+    }
 
-        @GetMapping("/filter")
-        public List<Student> filterByLevel(@RequestParam Level level) {
-            return studentService.filterByLevel(level);
-        }
+    @GetMapping("/filter")
+    public List<Student> filterByLevel(@RequestParam Level level) {
+        return studentService.filterByLevel(level);
+    }
 
-        @GetMapping("/page")
-        public Page<Student> getStudentsPage(@RequestParam int page,
-                                             @RequestParam int size) {
-            return studentService.getStudentsPage(page, size);
-        }
+    @GetMapping("/page")
+    public Page<Student> getStudentsPage(@RequestParam int page,
+                                         @RequestParam int size) {
+        return studentService.getStudentsPage(page, size);
+    }
 
-        @GetMapping("/export")
-        public byte[] export() {
-            return studentService.exportStudents();
-        }
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> export() {
+        byte[] data = studentService.exportStudents();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=students.csv");
+        headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(data);
+    }
 
         @PostMapping("/import")
         public void importStudents(@RequestParam("file") MultipartFile file)

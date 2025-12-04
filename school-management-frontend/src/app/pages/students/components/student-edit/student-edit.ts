@@ -23,7 +23,7 @@ export class StudentEdit {
   readonly XIcon = X;
   readonly SaveIcon = Save;
   
-  levels = Object.values(Level).filter(value => typeof value === 'number') as Level[];
+  levels = Object.values(Level) as Level[];
   
   editForm: Student = {
     id: 0,

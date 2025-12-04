@@ -60,7 +60,7 @@
               <lucide-angular [img]="EditIcon" class="w-4 h-4"></lucide-angular>
               Edit
             </button>
-            <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1" (click)="requestDeleteStudent(student.id || i + 1)">
+            <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="!student.id" (click)="requestDeleteStudent(student.id!)">
               <lucide-angular [img]="Trash2Icon" class="w-4 h-4"></lucide-angular>
               Delete
             </button>
