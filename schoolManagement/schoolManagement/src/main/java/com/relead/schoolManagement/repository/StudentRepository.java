@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByUsernameContainingIgnoreCase(String username);
-    Student findById(long id);
+    //Student findById(long id);
     List<Student> findByLevel(Level level);
     @Query("SELECT s FROM Student s WHERE LOWER(s.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Student> searchStudents(@Param("keyword") String keyword);
