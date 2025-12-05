@@ -2,11 +2,11 @@
 
 Application complète de gestion scolaire avec un backend Spring Boot, un frontend Angular, une base de données PostgreSQL et une conteneurisation Docker.
 
-## � Démonstration
+##  Démonstration
 
 - [Voir la démo sur Google Drive](https://drive.google.com/drive/folders/1LrVg4WrAv1rM25Yn4_0FB09vInsdoscw?usp=sharing)
 
-## �📋 Prérequis
+## 📋 Prérequis
 
 - Java 17 ou supérieur
 - Node.js (dernière version LTS recommandée)
@@ -16,7 +16,7 @@ Application complète de gestion scolaire avec un backend Spring Boot, un fronte
 - Maven (pour le backend)
 - Angular CLI (pour le frontend)
 
-## 🚀 Structure du Projet
+##  Structure du Projet
 
 ```
 relead/
@@ -30,7 +30,7 @@ relead/
 └── README.md
 ```
 
-## 🛠 Installation
+##  Installation
 
 ### 1. Backend (Spring Boot)
 
@@ -141,7 +141,7 @@ Pour le déploiement en production, assurez-vous de :
 
 ## ⚠️ Problèmes connus
 
-### Problème d'accès aux routes Angular via Nginx
+### Problème d'accès aux routes Angular via Nginx (Etape de dockerization)
 
 **Symptômes :**
 - L'application se charge correctement sur la page d'accueil
@@ -161,19 +161,3 @@ Malgré ces tentatives, l'accès direct aux routes ne fonctionne toujours pas vi
 ## 🤝 Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
-
-## 🔍 Dépannage
-
-### Vérification des fichiers dans le conteneur
-```bash
-docker exec -it school_frontend ls -la /usr/share/nginx/html
-```
-
-### Consultation des logs Nginx
-```bash
-docker logs -f school_frontend
-```
-
-### Accès au shell du conteneur pour le débogage
-```bash
-docker exec -it school_frontend /bin/sh
