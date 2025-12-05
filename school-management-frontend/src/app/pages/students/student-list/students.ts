@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { StudentService } from '../../../services/StudentService';
 import { Student } from '../../../models/student';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StudentTable } from '../components/student-table/student-table';
 import { StudentForm } from '../components/student-form/student-form';
@@ -27,6 +27,8 @@ export class Students implements OnInit {
   // Search and filter properties
   searchQuery = '';
   selectedLevel: Level | '' = '';
+  isSearchActive = false;
+  isFilterActive = false;
   
   // Pagination properties
   currentPage = 0;
@@ -37,26 +39,26 @@ export class Students implements OnInit {
   // Import/Export properties
   isImporting = false;
   isExporting = false;
+  constructor(private studentService: StudentService, private cdr: ChangeDetectorRef,@Inject(PLATFORM_ID) private platformId: any
+) { }
 
-  constructor(private studentService: StudentService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     console.log('Students component initialized');
-    this.loadStudents();
+     if (!isPlatformBrowser(this.platformId)) {
+        console.log("SSR mode detected → skip API calls");
+        return;
+    }
+    this.loadStudentsPage();
   }
+
   onDeleteStudentRequest(studentId: number): void {
     console.log('Delete request received for student:', studentId);
     this.studentService.deleteStudent(studentId).subscribe({
       next: () => {
         console.log('Student deleted successfully');
-        this.students = this.students.filter(s => s.id !== studentId);
-        if (this.searchQuery.trim()) {
-          this.searchStudents();
-        } else if (this.selectedLevel) {
-          this.filterByLevel();
-        } else {
-          this.loadStudents();
-        }
+        // Recharger la page actuelle pour maintenir la cohérence
+        this.loadCurrentPage();
       },
       error: (err) => {
         console.error('Error deleting student:', err);
@@ -80,7 +82,7 @@ export class Students implements OnInit {
       next: (newStudent) => {
         console.log('Student added successfully:', newStudent);
         this.hideForm();
-        this.loadStudents();
+        this.loadCurrentPage();
       },
       error: (err) => {
         console.error('Error adding student:', err);
@@ -112,7 +114,7 @@ export class Students implements OnInit {
       next: (updatedStudent) => {
         console.log('Student updated successfully:', updatedStudent);
         this.hideEditForm();
-        this.loadStudents();
+        this.loadCurrentPage();
       },
       error: (err) => {
         console.error('Error updating student:', err);
@@ -125,49 +127,85 @@ export class Students implements OnInit {
     console.log('Loading students...');
     this.isLoading = true;
     this.hasError = false;
-    
-    const timeout = setTimeout(() => {
-      if (this.isLoading) {
-        console.warn('Loading timeout - resetting state');
-        this.isLoading = false;
-        this.hasError = true;
-      }
-    }, 5000); 
-    
+
     this.studentService.getAllStudents().subscribe({
       next: (data: Student[]) => {
-        clearTimeout(timeout);
         console.log('Students loaded:', data);
         this.students = data;
+        this.totalElements = data.length;
+        this.totalPages = Math.ceil(data.length / this.pageSize);
         this.isLoading = false;
       },
       error: (err) => {
-        clearTimeout(timeout);
         console.error('Error loading students:', err);
-        this.isLoading = false;
         this.hasError = true;
+        this.isLoading = false;
       }
     });
+  }
+
+  loadStudentsPage(): void {
+    console.log('Loading paginated students...');
+    this.isLoading = true;
+    this.hasError = false;
+
+    this.studentService.getStudentsPage(this.currentPage, this.pageSize).subscribe({
+      next: (pageData: any) => {
+        console.log('Page loaded:', pageData);
+        this.students = pageData.content || [];
+        this.totalElements = pageData.totalElements || 0;
+        this.totalPages = pageData.totalPages || 0;
+        this.isLoading = false;
+        // Forcer la détection de changement
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading students page:', err);
+        this.hasError = true;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadCurrentPage(): void {
+    if (this.isSearchActive) {
+      this.searchStudents();
+    } else if (this.isFilterActive) {
+      this.filterByLevel();
+    } else {
+      this.loadStudentsPage();
+    }
   }
 
   // Search functionality
   searchStudents(): void {
     if (!this.searchQuery.trim()) {
-      this.loadStudents();
+      this.isSearchActive = false;
+      this.currentPage = 0;
+      this.loadStudentsPage();
       return;
     }
     
+    this.isSearchActive = true;
+    this.isFilterActive = false;
+    this.currentPage = 0;
     this.isLoading = true;
     this.hasError = false;
+    
     this.studentService.searchStudents(this.searchQuery).subscribe({
       next: (data: Student[]) => {
         this.students = data;
+        this.totalElements = data.length;
+        this.totalPages = Math.ceil(data.length / this.pageSize);
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error searching students:', err);
         this.hasError = true;
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -175,47 +213,39 @@ export class Students implements OnInit {
   // Filter by level functionality
   filterByLevel(): void {
     if (!this.selectedLevel) {
-      this.loadStudents();
+      this.isFilterActive = false;
+      this.currentPage = 0;
+      this.loadStudentsPage();
       return;
     }
     
+    this.isFilterActive = true;
+    this.isSearchActive = false;
+    this.currentPage = 0;
     this.isLoading = true;
     this.hasError = false;
+    
     this.studentService.filterByLevel(this.selectedLevel as Level).subscribe({
       next: (data: Student[]) => {
         this.students = data;
+        this.totalElements = data.length;
+        this.totalPages = Math.ceil(data.length / this.pageSize);
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error filtering students:', err);
         this.hasError = true;
         this.isLoading = false;
-      }
-    });
-  }
-
-  // Pagination functionality
-  loadStudentsPage(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    this.studentService.getStudentsPage(this.currentPage, this.pageSize).subscribe({
-      next: (pageData: any) => {
-        this.students = pageData.content;
-        this.totalElements = pageData.totalElements;
-        this.totalPages = pageData.totalPages;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading students page:', err);
-        this.hasError = true;
-        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
   onPageChange(page: number): void {
+    if (page < 0 || page >= this.totalPages) return;
     this.currentPage = page;
-    this.loadStudentsPage();
+    this.loadCurrentPage();
   }
 
   // Export functionality
@@ -269,7 +299,7 @@ export class Students implements OnInit {
       .subscribe({
         next: () => {
           console.log('Students imported successfully');
-          this.loadStudents();
+          this.loadCurrentPage();
           alert('Students imported successfully!');
         },
         error: (err) => {
@@ -283,6 +313,8 @@ export class Students implements OnInit {
     this.searchQuery = '';
     this.selectedLevel = '';
     this.currentPage = 0;
-    this.loadStudents();
+    this.isSearchActive = false;
+    this.isFilterActive = false;
+    this.loadStudentsPage();
   }
 }

@@ -18,12 +18,17 @@ export class Login {
   constructor(private auth: AuthService , private router: Router) {}
 
   submitForm(): void {
+    console.log('submitForm called', { username: this.username, password: this.password });
     this.auth.login(this.username, this.password).subscribe({
       next: (res) => {
+        console.log('login success', res);
+        console.log('Token received:', res.token);
         this.auth.saveToken(res.token);
+        console.log('Token after saveToken:', this.auth.getToken());
         this.router.navigate(['/students']);
       },
-      error: () => {
+      error: (err) => {
+        console.error('login error', err);
         alert('Bad credentials');
       }
     });

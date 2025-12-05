@@ -9,7 +9,7 @@ import { Level } from '../models/Level';
 })
 export class StudentService {
 
-    private API_URL = 'http://localhost:8080/api';
+    private API_URL = 'http://127.0.0.1:8080/api';
 
     constructor(private http: HttpClient) { }
 
